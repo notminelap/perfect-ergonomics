@@ -103,21 +103,26 @@ app.get('/api/inventory/:id/transactions', async (req, res) => {
 
 app.post('/api/inventory/:id/transaction', async (req, res) => {
   try {
-    const item = await Item.findOne({ id: req.params.id });
-    if (!item) return res.status(404).json({ error: 'Item not found' });
-
     const { type, quantity, partyName, date, address, billingNumber } = req.body;
     const numQty = Number(quantity);
 
-    if (type === 'IN') {
-      item.quantity = (item.quantity || 0) + numQty;
-    } else if (type === 'OUT') {
-      if ((item.quantity || 0) < numQty) {
+    // Check stock for OUT transactions
+    if (type === 'OUT') {
+      const current = await Item.findOne({ id: req.params.id }).lean();
+      if (!current) return res.status(404).json({ error: 'Item not found' });
+      if ((current.quantity || 0) < numQty) {
         return res.status(400).json({ error: 'Insufficient stock to fulfill transaction' });
       }
-      item.quantity -= numQty;
     }
-    await item.save();
+
+    // Use $inc to atomically update quantity — avoids _id:false save() issue
+    const delta = type === 'IN' ? numQty : -numQty;
+    const updatedItem = await Item.findOneAndUpdate(
+      { id: req.params.id },
+      { $inc: { quantity: delta } },
+      { new: true }
+    ).lean();
+    if (!updatedItem) return res.status(404).json({ error: 'Item not found' });
 
     const tx = new Transaction({
       id:            Date.now().toString() + Math.floor(Math.random() * 1000),
@@ -132,7 +137,7 @@ app.post('/api/inventory/:id/transaction', async (req, res) => {
     });
     await tx.save();
 
-    res.status(201).json({ item: lean(item), transaction: lean(tx) });
+    res.status(201).json({ item: updatedItem, transaction: lean(tx) });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
