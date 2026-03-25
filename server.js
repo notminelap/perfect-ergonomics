@@ -154,7 +154,7 @@ app.get('/api/transactions', async (req, res) => {
 // ── Serve built frontend (production) ─────────────────────────────────
 const distPath = join(__dirname, 'dist');
 app.use(express.static(distPath));
-app.get('*', (req, res) => res.sendFile(join(distPath, 'index.html')));
+app.get('/{*path}', (req, res) => res.sendFile(join(distPath, 'index.html')));
 
 // ── Start ──────────────────────────────────────────────────────────────
 app.listen(PORT, '0.0.0.0', () => {
