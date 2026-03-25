@@ -35,7 +35,7 @@ const transactionSchema = new mongoose.Schema({
   address:       String,
   billingNumber: String,
   timestamp:     String,
-}, { _id: false });
+});
 
 const itemSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
