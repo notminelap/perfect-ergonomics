@@ -1,0 +1,3 @@
+C:\Users\Radhesh Ranvijay\.gemini\antigravity\scratch\perfect-ergonomics\src\App.jsx : 1 : 'useEffect' is defined but never used. Allowed unused vars must match /^[A-Z_]/u.
+C:\Users\Radhesh Ranvijay\.gemini\antigravity\scratch\perfect-ergonomics\src\pages\Dashboard.jsx : 40 : Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps').
+C:\Users\Radhesh Ranvijay\.gemini\antigravity\scratch\perfect-ergonomics\src\pages\Dashboard.jsx : 53 : 'err' is defined but never used.
